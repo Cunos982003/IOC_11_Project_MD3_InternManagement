@@ -1,10 +1,14 @@
 package re.edu.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import re.edu.dto.request.MentorRequest;
 import re.edu.dto.request.UpdateMentorRequest;
 import re.edu.dto.response.MentorResponse;
+import re.edu.dto.response.PaginatedData;
 import re.edu.entity.Mentor;
 import re.edu.entity.User;
 import re.edu.exception.ConflictException;
@@ -27,8 +31,25 @@ public class MentorServiceImpl implements MentorService {
     private final MentorMapper mentorMapper;
 
     @Override
-    public List<MentorResponse> getAllMentors(String currentUsername) {
-        return mentorRepository.findAll().stream().map(mentorMapper::toResponse).toList();
+    public PaginatedData<MentorResponse> getAllMentors(String currentUsername, int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+        Page<Mentor> mentors = mentorRepository.findAll(pageable);
+
+        List<MentorResponse> items = mentors.getContent().stream()
+                .map(mentorMapper::toResponse)
+                .toList();
+
+        PaginatedData.Pagination pagination = PaginatedData.Pagination.builder()
+                .currentPage(page)
+                .pageSize(pageSize)
+                .totalPages(mentors.getTotalPages())
+                .totalItems(mentors.getTotalElements())
+                .build();
+
+        return PaginatedData.<MentorResponse>builder()
+                .items(items)
+                .pagination(pagination)
+                .build();
     }
 
     @Override

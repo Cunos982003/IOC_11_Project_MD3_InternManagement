@@ -1,12 +1,16 @@
 package re.edu.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import re.edu.dto.request.UpdateRoleRequest;
 import re.edu.dto.request.UpdateStatusRequest;
 import re.edu.dto.request.UpdateUserRequest;
 import re.edu.dto.request.UserRequest;
+import re.edu.dto.response.PaginatedData;
 import re.edu.dto.response.UserResponse;
 import re.edu.entity.User;
 import re.edu.exception.ConflictException;
@@ -28,11 +32,27 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public List<UserResponse> getAllUsers(Role role) {
-        List<User> users = (role != null)
-                ? userRepository.findByRole(role)
-                : userRepository.findAll();
-        return users.stream().map(userMapper::toResponse).toList();
+    public PaginatedData<UserResponse> getAllUsers(Role role, int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
+        Page<User> users = (role != null)
+                ? userRepository.findByRole(role, pageable)
+                : userRepository.findAll(pageable);
+
+        List<UserResponse> items = users.getContent().stream()
+                .map(userMapper::toResponse)
+                .toList();
+
+        PaginatedData.Pagination pagination = PaginatedData.Pagination.builder()
+                .currentPage(page)
+                .pageSize(pageSize)
+                .totalPages(users.getTotalPages())
+                .totalItems(users.getTotalElements())
+                .build();
+
+        return PaginatedData.<UserResponse>builder()
+                .items(items)
+                .pagination(pagination)
+                .build();
     }
 
     @Override

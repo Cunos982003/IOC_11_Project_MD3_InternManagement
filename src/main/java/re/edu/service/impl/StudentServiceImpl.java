@@ -1,9 +1,13 @@
 package re.edu.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import re.edu.dto.request.StudentRequest;
 import re.edu.dto.request.UpdateStudentRequest;
+import re.edu.dto.response.PaginatedData;
 import re.edu.dto.response.StudentResponse;
 import re.edu.entity.Mentor;
 import re.edu.entity.Student;
@@ -30,18 +34,35 @@ public class StudentServiceImpl implements StudentService {
     private final StudentMapper studentMapper;
 
     @Override
-    public List<StudentResponse> getAllStudents(String currentUsername) {
+    public PaginatedData<StudentResponse> getAllStudents(String currentUsername, int page, int pageSize) {
         User currentUser = findUserByUsername(currentUsername);
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
 
+        Page<Student> students;
         if (currentUser.getRole() == Role.ADMIN) {
-            return studentRepository.findAll().stream().map(studentMapper::toResponse).toList();
+            students = studentRepository.findAll(pageable);
+        } else {
+            // MENTOR: chỉ xem sinh viên được phân công
+            Mentor mentor = mentorRepository.findByUserId(currentUser.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy thông tin mentor"));
+            students = studentRepository.findAllByMentorId(mentor.getId(), pageable);
         }
 
-        // MENTOR: chỉ xem sinh viên được phân công
-        Mentor mentor = mentorRepository.findByUserId(currentUser.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy thông tin mentor"));
-        return studentRepository.findAllByMentorId(mentor.getId()).stream()
-                .map(studentMapper::toResponse).toList();
+        List<StudentResponse> items = students.getContent().stream()
+                .map(studentMapper::toResponse)
+                .toList();
+
+        PaginatedData.Pagination pagination = PaginatedData.Pagination.builder()
+                .currentPage(page)
+                .pageSize(pageSize)
+                .totalPages(students.getTotalPages())
+                .totalItems(students.getTotalElements())
+                .build();
+
+        return PaginatedData.<StudentResponse>builder()
+                .items(items)
+                .pagination(pagination)
+                .build();
     }
 
     @Override

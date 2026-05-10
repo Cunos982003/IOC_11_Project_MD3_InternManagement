@@ -25,8 +25,11 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<?>> getAllUsers(@RequestParam(required = false) Role role) {
-        return ResponseEntity.ok(ApiResponse.success(userService.getAllUsers(role)));
+    public ResponseEntity<ApiResponse<?>> getAllUsers(
+            @RequestParam(required = false) Role role,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return ResponseEntity.ok(ApiResponse.success(userService.getAllUsers(role, page, pageSize)));
     }
 
     @GetMapping("/{id}")

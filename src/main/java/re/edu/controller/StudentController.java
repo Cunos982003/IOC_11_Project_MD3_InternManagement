@@ -22,8 +22,11 @@ public class StudentController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'MENTOR')")
-    public ResponseEntity<ApiResponse<?>> getAllStudents(@AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(ApiResponse.success(studentService.getAllStudents(userDetails.getUsername())));
+    public ResponseEntity<ApiResponse<?>> getAllStudents(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return ResponseEntity.ok(ApiResponse.success(studentService.getAllStudents(userDetails.getUsername(), page, pageSize)));
     }
 
     @GetMapping("/{id}")

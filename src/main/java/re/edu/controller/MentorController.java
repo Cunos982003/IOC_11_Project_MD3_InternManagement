@@ -22,8 +22,11 @@ public class MentorController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT')")
-    public ResponseEntity<ApiResponse<?>> getAllMentors(@AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(ApiResponse.success(mentorService.getAllMentors(userDetails.getUsername())));
+    public ResponseEntity<ApiResponse<?>> getAllMentors(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return ResponseEntity.ok(ApiResponse.success(mentorService.getAllMentors(userDetails.getUsername(), page, pageSize)));
     }
 
     @GetMapping("/{id}")

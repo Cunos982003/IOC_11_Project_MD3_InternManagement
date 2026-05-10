@@ -7,6 +7,7 @@ import re.edu.exception.ForbiddenException;
 import re.edu.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -51,15 +52,21 @@ public class GlobalExceptionHandler {
         return ApiResponse.error("Bạn không có quyền thực hiện thao tác này");
     }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiResponse<?> handleBadCredentials(BadCredentialsException ex) {
+        return ApiResponse.error("Tên đăng nhập hoặc mật khẩu không đúng");
+    }
+
     @ExceptionHandler(AuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ApiResponse<?> handleAuthentication(AuthenticationException ex) {
-        return ApiResponse.error("Xác thực thất bại: " + ex.getMessage());
+        return ApiResponse.error("Xác thực thất bại");
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiResponse<?> handleGeneral(Exception ex) {
-        return ApiResponse.error("Lỗi hệ thống: " + ex.getMessage());
+        return ApiResponse.error("Lỗi hệ thống");
     }
 }

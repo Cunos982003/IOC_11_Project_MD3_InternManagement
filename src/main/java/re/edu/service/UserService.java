@@ -4,13 +4,12 @@ import re.edu.dto.request.UpdateRoleRequest;
 import re.edu.dto.request.UpdateStatusRequest;
 import re.edu.dto.request.UpdateUserRequest;
 import re.edu.dto.request.UserRequest;
+import re.edu.dto.response.PaginatedData;
 import re.edu.dto.response.UserResponse;
 import re.edu.util.Role;
 
-import java.util.List;
-
 public interface UserService {
-    List<UserResponse> getAllUsers(Role role);
+    PaginatedData<UserResponse> getAllUsers(Role role, int page, int pageSize);
     UserResponse getUserById(Long id);
     UserResponse createUser(UserRequest request);
     UserResponse updateUser(Long id, UpdateUserRequest request);
