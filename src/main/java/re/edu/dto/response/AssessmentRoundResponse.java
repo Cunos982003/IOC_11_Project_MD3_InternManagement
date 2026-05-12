@@ -1,26 +1,27 @@
 package re.edu.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import re.edu.util.PhaseStatus;
+import lombok.*;
+import re.edu.util.RoundStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class InternshipPhaseResponse {
-
+public class AssessmentRoundResponse {
     private Long id;
     private String name;
     private String description;
+    private Long phaseId;
+    private String phaseName;
     private LocalDate startDate;
     private LocalDate endDate;
-    private PhaseStatus status;
+    private RoundStatus status;
+    private List<EvaluationCriteriaResponse> criteria;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

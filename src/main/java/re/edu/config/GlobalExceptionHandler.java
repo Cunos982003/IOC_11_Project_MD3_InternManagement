@@ -1,10 +1,5 @@
 package re.edu.config;
 
-import re.edu.dto.response.ApiResponse;
-import re.edu.dto.response.FieldError;
-import re.edu.exception.ConflictException;
-import re.edu.exception.ForbiddenException;
-import re.edu.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -13,6 +8,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import re.edu.dto.response.ApiResponse;
+import re.edu.dto.response.FieldError;
+import re.edu.exception.*;
 
 import java.util.List;
 
@@ -40,9 +38,21 @@ public class GlobalExceptionHandler {
         return ApiResponse.error(ex.getMessage());
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<?> handleBadRequest(BadRequestException ex) {
+        return ApiResponse.error(ex.getMessage());
+    }
+
     @ExceptionHandler(ForbiddenException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ApiResponse<?> handleForbidden(ForbiddenException ex) {
+        return ApiResponse.error(ex.getMessage());
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiResponse<?> handleUnauthorized(UnauthorizedException ex) {
         return ApiResponse.error(ex.getMessage());
     }
 

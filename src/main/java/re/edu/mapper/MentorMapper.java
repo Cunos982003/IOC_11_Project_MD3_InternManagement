@@ -1,24 +1,24 @@
 package re.edu.mapper;
 
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import re.edu.dto.response.MentorResponse;
 import re.edu.entity.Mentor;
 
 @Component
+@RequiredArgsConstructor
 public class MentorMapper {
 
+    private final ModelMapper modelMapper;
+
     public MentorResponse toResponse(Mentor mentor) {
-        return MentorResponse.builder()
-                .id(mentor.getId())
-                .userId(mentor.getUser().getId())
-                .username(mentor.getUser().getUsername())
-                .email(mentor.getUser().getEmail())
-                .fullName(mentor.getFullName())
-                .department(mentor.getDepartment())
-                .phone(mentor.getPhone())
-                .specialization(mentor.getSpecialization())
-                .createdAt(mentor.getCreatedAt())
-                .updatedAt(mentor.getUpdatedAt())
-                .build();
+        MentorResponse response = modelMapper.map(mentor, MentorResponse.class);
+        if (mentor.getUser() != null) {
+            response.setUserId(mentor.getUser().getId());
+            response.setUsername(mentor.getUser().getUsername());
+            response.setEmail(mentor.getUser().getEmail());
+        }
+        return response;
     }
 }

@@ -1,35 +1,27 @@
 package re.edu.mapper;
 
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import re.edu.dto.request.EvaluationCriteriaRequest;
 import re.edu.dto.response.EvaluationCriteriaResponse;
 import re.edu.entity.EvaluationCriteria;
 
 @Component
+@RequiredArgsConstructor
 public class EvaluationCriteriaMapper {
 
+    private final ModelMapper modelMapper;
+
     public EvaluationCriteriaResponse toResponse(EvaluationCriteria criteria) {
-        return EvaluationCriteriaResponse.builder()
-                .id(criteria.getId())
-                .name(criteria.getName())
-                .description(criteria.getDescription())
-                .maxScore(criteria.getMaxScore())
-                .createdAt(criteria.getCreatedAt())
-                .updatedAt(criteria.getUpdatedAt())
-                .build();
+        return modelMapper.map(criteria, EvaluationCriteriaResponse.class);
     }
 
     public EvaluationCriteria toEntity(EvaluationCriteriaRequest request) {
-        return EvaluationCriteria.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .maxScore(request.getMaxScore())
-                .build();
+        return modelMapper.map(request, EvaluationCriteria.class);
     }
 
     public void updateEntity(EvaluationCriteriaRequest request, EvaluationCriteria criteria) {
-        criteria.setName(request.getName());
-        criteria.setDescription(request.getDescription());
-        criteria.setMaxScore(request.getMaxScore());
+        modelMapper.map(request, criteria);
     }
 }

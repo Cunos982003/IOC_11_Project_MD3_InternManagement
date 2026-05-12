@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import re.edu.util.CriteriaType;
 
 import java.time.LocalDateTime;
 
@@ -28,6 +29,16 @@ public class EvaluationCriteria {
 
     @Column(name = "max_score")
     private Double maxScore;
+
+    @Column(name = "weight")
+    private Double weight;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "criteria_type", length = 50)
+    private CriteriaType criteriaType;
+
+    @Column(name = "is_active")
+    private Boolean isActive = true;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

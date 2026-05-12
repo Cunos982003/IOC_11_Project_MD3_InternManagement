@@ -1,41 +1,27 @@
 package re.edu.mapper;
 
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import re.edu.dto.request.InternshipPhaseRequest;
 import re.edu.dto.response.InternshipPhaseResponse;
 import re.edu.entity.InternshipPhase;
 
 @Component
+@RequiredArgsConstructor
 public class InternshipPhaseMapper {
 
+    private final ModelMapper modelMapper;
+
     public InternshipPhaseResponse toResponse(InternshipPhase phase) {
-        return InternshipPhaseResponse.builder()
-                .id(phase.getId())
-                .name(phase.getName())
-                .description(phase.getDescription())
-                .startDate(phase.getStartDate())
-                .endDate(phase.getEndDate())
-                .status(phase.getStatus())
-                .createdAt(phase.getCreatedAt())
-                .updatedAt(phase.getUpdatedAt())
-                .build();
+        return modelMapper.map(phase, InternshipPhaseResponse.class);
     }
 
     public InternshipPhase toEntity(InternshipPhaseRequest request) {
-        return InternshipPhase.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .startDate(request.getStartDate())
-                .endDate(request.getEndDate())
-                .status(request.getStatus())
-                .build();
+        return modelMapper.map(request, InternshipPhase.class);
     }
 
     public void updateEntity(InternshipPhaseRequest request, InternshipPhase phase) {
-        phase.setName(request.getName());
-        phase.setDescription(request.getDescription());
-        phase.setStartDate(request.getStartDate());
-        phase.setEndDate(request.getEndDate());
-        phase.setStatus(request.getStatus());
+        modelMapper.map(request, phase);
     }
 }

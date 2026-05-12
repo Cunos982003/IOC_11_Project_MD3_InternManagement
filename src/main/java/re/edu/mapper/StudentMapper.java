@@ -1,27 +1,24 @@
 package re.edu.mapper;
 
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import re.edu.dto.response.StudentResponse;
 import re.edu.entity.Student;
 
 @Component
+@RequiredArgsConstructor
 public class StudentMapper {
 
+    private final ModelMapper modelMapper;
+
     public StudentResponse toResponse(Student student) {
-        return StudentResponse.builder()
-                .id(student.getId())
-                .userId(student.getUser().getId())
-                .username(student.getUser().getUsername())
-                .email(student.getUser().getEmail())
-                .studentCode(student.getStudentCode())
-                .fullName(student.getFullName())
-                .dateOfBirth(student.getDateOfBirth())
-                .phone(student.getPhone())
-                .address(student.getAddress())
-                .gpa(student.getGpa())
-                .major(student.getMajor())
-                .createdAt(student.getCreatedAt())
-                .updatedAt(student.getUpdatedAt())
-                .build();
+        StudentResponse response = modelMapper.map(student, StudentResponse.class);
+        if (student.getUser() != null) {
+            response.setUserId(student.getUser().getId());
+            response.setUsername(student.getUser().getUsername());
+            response.setEmail(student.getUser().getEmail());
+        }
+        return response;
     }
 }
