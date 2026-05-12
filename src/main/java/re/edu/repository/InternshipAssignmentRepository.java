@@ -1,12 +1,13 @@
 package re.edu.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import re.edu.entity.InternshipAssignment;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface InternshipAssignmentRepository extends JpaRepository<InternshipAssignment, Long> {
+public interface InternshipAssignmentRepository extends JpaRepository<InternshipAssignment, Long>, JpaSpecificationExecutor<InternshipAssignment> {
     List<InternshipAssignment> findByStudentId(Long studentId);
     List<InternshipAssignment> findByMentorId(Long mentorId);
     List<InternshipAssignment> findByPhaseId(Long phaseId);
