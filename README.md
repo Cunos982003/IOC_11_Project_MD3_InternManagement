@@ -89,9 +89,9 @@ Tạo database PostgreSQL:
 CREATE DATABASE internship_db;
 ```
 
-Chỉnh sửa file `src/main/resources/application.yml`:
+Chỉnh sửa file `src/main/resources/application.properties`:
 
-```yaml
+```properties
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/internship_db
