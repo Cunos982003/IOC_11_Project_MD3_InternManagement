@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import re.edu.dto.request.MentorRequest;
 import re.edu.dto.request.UpdateMentorRequest;
 import re.edu.dto.response.MentorResponse;
@@ -29,6 +31,7 @@ public class MentorServiceImpl implements MentorService {
     private final MentorRepository mentorRepository;
     private final UserRepository userRepository;
     private final MentorMapper mentorMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public PaginatedData<MentorResponse> getAllMentors(String currentUsername, int page, int pageSize) {
@@ -58,9 +61,7 @@ public class MentorServiceImpl implements MentorService {
         Mentor mentor = findById(id);
 
         if (currentUser.getRole() == Role.MENTOR) {
-            Mentor ownMentor = mentorRepository.findByUserId(currentUser.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy hồ sơ mentor"));
-            if (!ownMentor.getId().equals(id)) {
+            if (!mentor.getMentorId().equals(currentUser.getId())) {
                 throw new ForbiddenException("Bạn chỉ có thể xem thông tin của mình");
             }
         }
@@ -68,24 +69,37 @@ public class MentorServiceImpl implements MentorService {
     }
 
     @Override
+    @Transactional
     public MentorResponse createMentor(MentorRequest request) {
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("Người dùng không tồn tại với ID: " + request.getUserId()));
-
-        if (user.getRole() != Role.MENTOR) {
-            throw new ConflictException("Người dùng phải có vai trò MENTOR");
-        }
-        if (mentorRepository.existsByUserId(request.getUserId())) {
-            throw new ConflictException("Người dùng này đã có hồ sơ mentor");
+        // Check username exists
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new ConflictException("Username đã tồn tại");
         }
 
-        Mentor mentor = Mentor.builder()
-                .user(user)
+        // Check email exists
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new ConflictException("Email đã tồn tại");
+        }
+
+        // Create User first
+        User user = User.builder()
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
                 .fullName(request.getFullName())
-                .department(request.getDepartment())
-                .phone(request.getPhone())
-                .specialization(request.getSpecialization())
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .role(Role.MENTOR)
+                .isActive(true)
                 .build();
+        User savedUser = userRepository.save(user);
+
+        // Create Mentor
+        Mentor mentor = Mentor.builder()
+                .user(savedUser)
+                .department(request.getDepartment())
+                .academicRank(request.getAcademicRank())
+                .build();
+
         return mentorMapper.toResponse(mentorRepository.save(mentor));
     }
 
@@ -95,17 +109,13 @@ public class MentorServiceImpl implements MentorService {
         Mentor mentor = findById(id);
 
         if (currentUser.getRole() == Role.MENTOR) {
-            Mentor ownMentor = mentorRepository.findByUserId(currentUser.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy hồ sơ mentor"));
-            if (!ownMentor.getId().equals(id)) {
+            if (!mentor.getMentorId().equals(currentUser.getId())) {
                 throw new ForbiddenException("Bạn chỉ có thể cập nhật thông tin của mình");
             }
         }
 
-        if (request.getFullName() != null) mentor.setFullName(request.getFullName());
         if (request.getDepartment() != null) mentor.setDepartment(request.getDepartment());
-        if (request.getPhone() != null) mentor.setPhone(request.getPhone());
-        if (request.getSpecialization() != null) mentor.setSpecialization(request.getSpecialization());
+        if (request.getAcademicRank() != null) mentor.setAcademicRank(request.getAcademicRank());
 
         return mentorMapper.toResponse(mentorRepository.save(mentor));
     }

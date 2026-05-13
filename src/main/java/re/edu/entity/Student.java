@@ -18,32 +18,28 @@ import java.time.LocalDateTime;
 public class Student {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "student_id")
+    private Long studentId;
 
+    @MapsId
     @OneToOne
-    @JoinColumn(name = "user_id", unique = true, nullable = false)
+    @JoinColumn(name = "student_id")
     private User user;
 
     @Column(name = "student_code", unique = true, nullable = false, length = 20)
     private String studentCode;
 
-    @Column(name = "full_name", nullable = false, length = 100)
-    private String fullName;
+    @Column(length = 100)
+    private String major;
+
+    @Column(name = "class", length = 50)
+    private String className;
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
-    @Column(length = 20)
-    private String phone;
-
     @Column(length = 255)
     private String address;
-
-    private Double gpa;
-
-    @Column(length = 100)
-    private String major;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import re.edu.util.PhaseStatus;
 import re.edu.validation.DateRange;
 
 import java.time.LocalDate;
@@ -28,6 +27,4 @@ public class InternshipPhaseRequest {
 
     @NotNull(message = "Ngày kết thúc không được để trống")
     private LocalDate endDate;
-
-    private PhaseStatus status;
 }

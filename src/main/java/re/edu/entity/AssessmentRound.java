@@ -38,9 +38,8 @@ public class AssessmentRound {
     @Column(name = "end_date")
     private LocalDate endDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 50)
-    private RoundStatus status;
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

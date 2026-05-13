@@ -28,7 +28,7 @@ public class EvaluationCriteriaServiceImpl implements EvaluationCriteriaService 
     @Override
     public PaginatedData<EvaluationCriteriaResponse> getAllCriteria(int page, int pageSize) {
         Pageable pageable = PageRequest.of(page - 1, pageSize);
-        Page<EvaluationCriteria> criteria = criteriaRepository.findByIsActiveTrue(pageable);
+        Page<EvaluationCriteria> criteria = criteriaRepository.findAll(pageable);
 
         List<EvaluationCriteriaResponse> items = criteria.getContent().stream()
                 .map(criteriaMapper::toResponse)
@@ -60,7 +60,6 @@ public class EvaluationCriteriaServiceImpl implements EvaluationCriteriaService 
         }
 
         EvaluationCriteria criteria = criteriaMapper.toEntity(request);
-        criteria.setIsActive(true);
         EvaluationCriteria saved = criteriaRepository.save(criteria);
         return criteriaMapper.toResponse(saved);
     }
@@ -81,8 +80,7 @@ public class EvaluationCriteriaServiceImpl implements EvaluationCriteriaService 
     @Override
     public void deleteCriteria(Long id) {
         EvaluationCriteria criteria = findById(id);
-        criteria.setIsActive(false);
-        criteriaRepository.save(criteria);
+        criteriaRepository.delete(criteria);
     }
 
     private EvaluationCriteria findById(Long id) {

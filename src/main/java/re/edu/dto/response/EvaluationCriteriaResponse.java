@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import re.edu.util.CriteriaType;
 
 import java.time.LocalDateTime;
 
@@ -18,9 +17,6 @@ public class EvaluationCriteriaResponse {
     private String name;
     private String description;
     private Double maxScore;
-    private Double weight;
-    private CriteriaType criteriaType;
-    private Boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

@@ -2,10 +2,14 @@ package re.edu.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "round_criteria", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"round_id", "criteria_id"})
+        @UniqueConstraint(columnNames = {"round_id", "criterion_id"})
 })
 @Getter
 @Setter
@@ -23,9 +27,17 @@ public class RoundCriteria {
     private AssessmentRound round;
 
     @ManyToOne
-    @JoinColumn(name = "criteria_id", nullable = false)
+    @JoinColumn(name = "criterion_id", nullable = false)
     private EvaluationCriteria criteria;
 
     @Column(nullable = false)
     private Double weight;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }

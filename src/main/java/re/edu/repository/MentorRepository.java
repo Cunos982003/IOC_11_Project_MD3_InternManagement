@@ -6,6 +6,6 @@ import re.edu.entity.Mentor;
 import java.util.Optional;
 
 public interface MentorRepository extends JpaRepository<Mentor, Long> {
-    Optional<Mentor> findByUserId(Long userId);
-    boolean existsByUserId(Long userId);
+    Optional<Mentor> findByUserUsername(String username);
+    boolean existsByUserUsername(String username);
 }

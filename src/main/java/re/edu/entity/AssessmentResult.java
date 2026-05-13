@@ -8,7 +8,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "assessment_results")
+@Table(name = "assessment_results",
+       uniqueConstraints = @UniqueConstraint(columnNames = {"assignment_id", "round_id", "criterion_id"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,22 +26,29 @@ public class AssessmentResult {
     private InternshipAssignment assignment;
 
     @ManyToOne
-    @JoinColumn(name = "round_criteria_id", nullable = false)
-    private RoundCriteria roundCriteria;
+    @JoinColumn(name = "round_id", nullable = false)
+    private AssessmentRound round;
 
     @ManyToOne
-    @JoinColumn(name = "mentor_id", nullable = false)
-    private Mentor mentor;
+    @JoinColumn(name = "criterion_id", nullable = false)
+    private EvaluationCriteria criterion;
 
     @Column(nullable = false)
     private Double score;
 
     @Column(columnDefinition = "TEXT")
-    private String comment;
+    private String comments;
+
+    @ManyToOne
+    @JoinColumn(name = "evaluated_by", nullable = false)
+    private User evaluatedBy;
+
+    @Column(name = "evaluation_date")
+    private LocalDateTime evaluationDate;
 
     @CreationTimestamp
-    @Column(name = "evaluated_at", updatable = false)
-    private LocalDateTime evaluatedAt;
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")

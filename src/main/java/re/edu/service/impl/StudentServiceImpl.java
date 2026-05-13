@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import re.edu.dto.request.StudentRequest;
 import re.edu.dto.request.UpdateStudentRequest;
 import re.edu.dto.response.PaginatedData;
@@ -32,6 +34,7 @@ public class StudentServiceImpl implements StudentService {
     private final UserRepository userRepository;
     private final MentorRepository mentorRepository;
     private final StudentMapper studentMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public PaginatedData<StudentResponse> getAllStudents(String currentUsername, int page, int pageSize) {
@@ -42,10 +45,9 @@ public class StudentServiceImpl implements StudentService {
         if (currentUser.getRole() == Role.ADMIN) {
             students = studentRepository.findAll(pageable);
         } else {
-            // MENTOR: chỉ xem sinh viên được phân công
-            Mentor mentor = mentorRepository.findByUserId(currentUser.getId())
+            Mentor mentor = mentorRepository.findById(currentUser.getId())
                     .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy thông tin mentor"));
-            students = studentRepository.findAllByMentorId(mentor.getId(), pageable);
+            students = studentRepository.findAllByMentorId(mentor.getMentorId(), pageable);
         }
 
         List<StudentResponse> items = students.getContent().stream()
@@ -71,9 +73,7 @@ public class StudentServiceImpl implements StudentService {
         Student student = findById(id);
 
         if (currentUser.getRole() == Role.STUDENT) {
-            Student ownStudent = studentRepository.findByUserId(currentUser.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy hồ sơ sinh viên"));
-            if (!ownStudent.getId().equals(id)) {
+            if (!student.getStudentId().equals(currentUser.getId())) {
                 throw new ForbiddenException("Bạn chỉ có thể xem thông tin của mình");
             }
         }
@@ -81,30 +81,39 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    @Transactional
     public StudentResponse createStudent(StudentRequest request) {
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("Người dùng không tồn tại với ID: " + request.getUserId()));
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new ConflictException("Username đã tồn tại");
+        }
 
-        if (user.getRole() != Role.STUDENT) {
-            throw new ConflictException("Người dùng phải có vai trò STUDENT");
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new ConflictException("Email đã tồn tại");
         }
-        if (studentRepository.existsByUserId(request.getUserId())) {
-            throw new ConflictException("Người dùng này đã có hồ sơ sinh viên");
-        }
+
         if (studentRepository.existsByStudentCode(request.getStudentCode())) {
             throw new ConflictException("Mã sinh viên đã tồn tại");
         }
+        User user = User.builder()
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .fullName(request.getFullName())
+                .email(request.getEmail())
+                .phoneNumber(request.getPhone())
+                .role(Role.STUDENT)
+                .isActive(true)
+                .build();
+        User savedUser = userRepository.save(user);
 
         Student student = Student.builder()
-                .user(user)
+                .user(savedUser)
                 .studentCode(request.getStudentCode())
-                .fullName(request.getFullName())
                 .dateOfBirth(request.getDateOfBirth())
-                .phone(request.getPhone())
                 .address(request.getAddress())
-                .gpa(request.getGpa())
                 .major(request.getMajor())
+                .className(request.getClassName())
                 .build();
+
         return studentMapper.toResponse(studentRepository.save(student));
     }
 
@@ -114,18 +123,13 @@ public class StudentServiceImpl implements StudentService {
         Student student = findById(id);
 
         if (currentUser.getRole() == Role.STUDENT) {
-            Student ownStudent = studentRepository.findByUserId(currentUser.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy hồ sơ sinh viên"));
-            if (!ownStudent.getId().equals(id)) {
+            if (!student.getStudentId().equals(currentUser.getId())) {
                 throw new ForbiddenException("Bạn chỉ có thể cập nhật thông tin của mình");
             }
         }
 
-        if (request.getFullName() != null) student.setFullName(request.getFullName());
         if (request.getDateOfBirth() != null) student.setDateOfBirth(request.getDateOfBirth());
-        if (request.getPhone() != null) student.setPhone(request.getPhone());
         if (request.getAddress() != null) student.setAddress(request.getAddress());
-        if (request.getGpa() != null) student.setGpa(request.getGpa());
         if (request.getMajor() != null) student.setMajor(request.getMajor());
 
         return studentMapper.toResponse(studentRepository.save(student));

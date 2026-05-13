@@ -17,24 +17,19 @@ import java.time.LocalDateTime;
 public class Mentor {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "mentor_id")
+    private Long mentorId;
 
+    @MapsId
     @OneToOne
-    @JoinColumn(name = "user_id", unique = true, nullable = false)
+    @JoinColumn(name = "mentor_id")
     private User user;
-
-    @Column(name = "full_name", nullable = false, length = 100)
-    private String fullName;
 
     @Column(length = 100)
     private String department;
 
-    @Column(length = 20)
-    private String phone;
-
-    @Column(length = 100)
-    private String specialization;
+    @Column(name = "academic_rank", length = 50)
+    private String academicRank;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

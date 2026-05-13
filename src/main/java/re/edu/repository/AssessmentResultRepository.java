@@ -1,12 +1,9 @@
 package re.edu.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import re.edu.entity.AssessmentResult;
 
-import java.util.List;
-
-public interface AssessmentResultRepository extends JpaRepository<AssessmentResult, Long> {
-    List<AssessmentResult> findByAssignmentId(Long assignmentId);
-    List<AssessmentResult> findByMentorId(Long mentorId);
-    boolean existsByAssignmentIdAndRoundCriteriaId(Long assignmentId, Long roundCriteriaId);
+public interface AssessmentResultRepository extends JpaRepository<AssessmentResult, Long>, JpaSpecificationExecutor<AssessmentResult> {
+    boolean existsByAssignmentIdAndRoundIdAndCriterionId(Long assignmentId, Long roundId, Long criterionId);
 }

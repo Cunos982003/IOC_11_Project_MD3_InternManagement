@@ -11,7 +11,7 @@ import re.edu.dto.response.ApiResponse;
 import re.edu.service.InternshipPhaseService;
 
 @RestController
-@RequestMapping("/api/phases")
+@RequestMapping("/api/internship_phase")
 @RequiredArgsConstructor
 public class InternshipPhaseController {
 

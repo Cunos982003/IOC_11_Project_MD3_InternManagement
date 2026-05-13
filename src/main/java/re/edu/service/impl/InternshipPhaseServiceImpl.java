@@ -16,7 +16,6 @@ import re.edu.mapper.InternshipPhaseMapper;
 import re.edu.repository.InternshipPhaseRepository;
 import re.edu.service.InternshipPhaseService;
 import re.edu.util.Constants;
-import re.edu.util.PhaseStatus;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -67,9 +66,6 @@ public class InternshipPhaseServiceImpl implements InternshipPhaseService {
         }
 
         InternshipPhase phase = phaseMapper.toEntity(request);
-        if (phase.getStatus() == null) {
-            phase.setStatus(PhaseStatus.ACTIVE);
-        }
         InternshipPhase saved = phaseRepository.save(phase);
         return phaseMapper.toResponse(saved);
     }
@@ -77,10 +73,6 @@ public class InternshipPhaseServiceImpl implements InternshipPhaseService {
     @Override
     public InternshipPhaseResponse updatePhase(Long id, InternshipPhaseRequest request) {
         InternshipPhase phase = findById(id);
-
-        if (PhaseStatus.COMPLETED.equals(phase.getStatus())) {
-            throw new ConflictException(Constants.ERROR_PHASE_COMPLETED);
-        }
 
         if (!phase.getName().equals(request.getName()) && phaseRepository.existsByName(request.getName())) {
             throw new ConflictException("Tên giai đoạn đã tồn tại");

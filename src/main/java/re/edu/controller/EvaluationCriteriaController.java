@@ -11,7 +11,7 @@ import re.edu.dto.response.ApiResponse;
 import re.edu.service.EvaluationCriteriaService;
 
 @RestController
-@RequestMapping("/api/criteria")
+@RequestMapping("/api/evaluation_criteria")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
 public class EvaluationCriteriaController {

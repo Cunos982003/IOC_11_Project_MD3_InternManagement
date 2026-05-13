@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import re.edu.util.PhaseStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,10 +32,6 @@ public class InternshipPhase {
 
     @Column(name = "end_date")
     private LocalDate endDate;
-
-    @Enumerated(EnumType.STRING)
-    @Column(length = 50)
-    private PhaseStatus status;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

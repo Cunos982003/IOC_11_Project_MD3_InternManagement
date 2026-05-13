@@ -101,12 +101,10 @@ public class AssessmentRoundServiceImpl implements AssessmentRoundService {
         // Create round
         AssessmentRound round = roundMapper.toEntity(request);
         round.setPhase(phase);
-        if (round.getStatus() == null) {
-            round.setStatus(RoundStatus.PENDING);
-        }
         AssessmentRound savedRound = roundRepository.save(round);
 
-        // Create round criteria relationships
+        // Create round criteria relationships with default weight
+        double defaultWeight = 1.0 / request.getCriteriaIds().size();
         for (Long criteriaId : request.getCriteriaIds()) {
             EvaluationCriteria criteria = criteriaRepository.findById(criteriaId)
                     .orElseThrow(() -> new ResourceNotFoundException("Tiêu chí không tồn tại với ID: " + criteriaId));
@@ -114,7 +112,7 @@ public class AssessmentRoundServiceImpl implements AssessmentRoundService {
             RoundCriteria roundCriteria = RoundCriteria.builder()
                     .round(savedRound)
                     .criteria(criteria)
-                    .weight(criteria.getWeight())
+                    .weight(defaultWeight)
                     .build();
             roundCriteriaRepository.save(roundCriteria);
         }
@@ -126,11 +124,6 @@ public class AssessmentRoundServiceImpl implements AssessmentRoundService {
     @Transactional
     public AssessmentRoundResponse updateRound(Long id, AssessmentRoundRequest request) {
         AssessmentRound round = findById(id);
-
-        // Cannot update if completed
-        if (RoundStatus.COMPLETED.equals(round.getStatus())) {
-            throw new ConflictException("Không thể cập nhật đợt đánh giá đã hoàn thành");
-        }
 
         // Validate phase exists
         InternshipPhase phase = phaseRepository.findById(request.getPhaseId())
@@ -157,7 +150,8 @@ public class AssessmentRoundServiceImpl implements AssessmentRoundService {
             // Delete old criteria relationships
             roundCriteriaRepository.deleteByRoundId(id);
 
-            // Create new relationships
+            // Create new relationships with default weight
+            double defaultWeight = 1.0 / request.getCriteriaIds().size();
             for (Long criteriaId : request.getCriteriaIds()) {
                 EvaluationCriteria criteria = criteriaRepository.findById(criteriaId)
                         .orElseThrow(() -> new ResourceNotFoundException("Tiêu chí không tồn tại với ID: " + criteriaId));
@@ -165,7 +159,7 @@ public class AssessmentRoundServiceImpl implements AssessmentRoundService {
                 RoundCriteria roundCriteria = RoundCriteria.builder()
                         .round(updated)
                         .criteria(criteria)
-                        .weight(criteria.getWeight())
+                        .weight(defaultWeight)
                         .build();
                 roundCriteriaRepository.save(roundCriteria);
             }
@@ -178,11 +172,6 @@ public class AssessmentRoundServiceImpl implements AssessmentRoundService {
     @Transactional
     public void deleteRound(Long id) {
         AssessmentRound round = findById(id);
-
-        // Cannot delete if in progress
-        if (RoundStatus.IN_PROGRESS.equals(round.getStatus())) {
-            throw new ConflictException("Không thể xóa đợt đánh giá đang diễn ra");
-        }
 
         // Delete criteria relationships first
         roundCriteriaRepository.deleteByRoundId(id);

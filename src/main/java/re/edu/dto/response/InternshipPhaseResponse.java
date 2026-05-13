@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import re.edu.util.PhaseStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,7 +19,6 @@ public class InternshipPhaseResponse {
     private String description;
     private LocalDate startDate;
     private LocalDate endDate;
-    private PhaseStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
