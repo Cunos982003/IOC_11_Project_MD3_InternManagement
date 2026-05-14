@@ -11,7 +11,7 @@ import re.edu.dto.response.ApiResponse;
 import re.edu.service.AssessmentRoundService;
 
 @RestController
-@RequestMapping("/api/assessment_rounds")
+@RequestMapping("/api/assessment-rounds")
 @RequiredArgsConstructor
 public class AssessmentRoundController {
 

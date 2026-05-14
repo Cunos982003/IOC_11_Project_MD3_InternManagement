@@ -11,7 +11,7 @@ import re.edu.dto.response.ApiResponse;
 import re.edu.service.RoundCriteriaService;
 
 @RestController
-@RequestMapping("/api/round_criteria")
+@RequestMapping("/api/round-criteria")
 @RequiredArgsConstructor
 public class RoundCriteriaController {
 

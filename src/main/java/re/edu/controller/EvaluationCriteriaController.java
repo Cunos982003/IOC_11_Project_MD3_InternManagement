@@ -11,7 +11,7 @@ import re.edu.dto.response.ApiResponse;
 import re.edu.service.EvaluationCriteriaService;
 
 @RestController
-@RequestMapping("/api/evaluation_criteria")
+@RequestMapping("/api/evaluation-criteria")
 @RequiredArgsConstructor
 public class EvaluationCriteriaController {
 
