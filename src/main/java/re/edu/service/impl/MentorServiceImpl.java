@@ -98,7 +98,6 @@ public class MentorServiceImpl implements MentorService {
                 .build();
         User savedUser = userRepository.save(user);
 
-        // Create Mentor
         Mentor mentor = Mentor.builder()
                 .user(savedUser)
                 .department(request.getDepartment())
