@@ -8,7 +8,6 @@ import re.edu.entity.AssessmentRound;
 import java.util.List;
 
 public interface AssessmentRoundRepository extends JpaRepository<AssessmentRound, Long> {
-    List<AssessmentRound> findByPhaseId(Long phaseId);
     Page<AssessmentRound> findByPhaseId(Long phaseId, Pageable pageable);
     boolean existsByName(String name);
 }

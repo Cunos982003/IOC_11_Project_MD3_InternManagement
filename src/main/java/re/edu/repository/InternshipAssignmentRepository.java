@@ -8,9 +8,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface InternshipAssignmentRepository extends JpaRepository<InternshipAssignment, Long>, JpaSpecificationExecutor<InternshipAssignment> {
-    List<InternshipAssignment> findByStudentStudentId(Long studentId);
-    List<InternshipAssignment> findByMentorMentorId(Long mentorId);
-    List<InternshipAssignment> findByPhaseId(Long phaseId);
-    Optional<InternshipAssignment> findByStudentStudentIdAndMentorMentorIdAndPhaseId(Long studentId, Long mentorId, Long phaseId);
     boolean existsByStudentStudentIdAndPhaseId(Long studentId, Long phaseId);
 }

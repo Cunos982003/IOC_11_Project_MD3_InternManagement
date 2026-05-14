@@ -9,5 +9,4 @@ public interface RoundCriteriaRepository extends JpaRepository<RoundCriteria, Lo
     List<RoundCriteria> findByRoundId(Long roundId);
     boolean existsByRoundIdAndCriteriaId(Long roundId, Long criteriaId);
     void deleteByRoundId(Long roundId);
-    boolean existsByCriteriaId(Long criteriaId);
 }
