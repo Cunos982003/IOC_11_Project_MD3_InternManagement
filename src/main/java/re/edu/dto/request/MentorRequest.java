@@ -25,8 +25,6 @@ public class MentorRequest {
     private String fullName;
 
     private String phoneNumber;
-
-    // Mentor fields
     private String department;
     private String academicRank;
 }
