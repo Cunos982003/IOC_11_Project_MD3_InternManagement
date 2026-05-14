@@ -13,12 +13,12 @@ import re.edu.service.EvaluationCriteriaService;
 @RestController
 @RequestMapping("/api/evaluation_criteria")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
 public class EvaluationCriteriaController {
 
     private final EvaluationCriteriaService criteriaService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MENTOR', 'STUDENT')")
     public ResponseEntity<ApiResponse<?>> getAllCriteria(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize) {
@@ -26,17 +26,20 @@ public class EvaluationCriteriaController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MENTOR', 'STUDENT')")
     public ResponseEntity<ApiResponse<?>> getCriteriaById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(criteriaService.getCriteriaById(id)));
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<?>> createCriteria(@Valid @RequestBody EvaluationCriteriaRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Tạo tiêu chí thành công", criteriaService.createCriteria(request)));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<?>> updateCriteria(@PathVariable Long id,
                                                          @Valid @RequestBody EvaluationCriteriaRequest request) {
         return ResponseEntity.ok(ApiResponse.success("Cập nhật tiêu chí thành công",
@@ -44,6 +47,7 @@ public class EvaluationCriteriaController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<?>> deleteCriteria(@PathVariable Long id) {
         criteriaService.deleteCriteria(id);
         return ResponseEntity.ok(ApiResponse.success("Xóa tiêu chí thành công"));

@@ -11,14 +11,14 @@ import re.edu.dto.response.ApiResponse;
 import re.edu.service.InternshipPhaseService;
 
 @RestController
-@RequestMapping("/api/internship_phase")
+@RequestMapping("/api/internship_phases")
 @RequiredArgsConstructor
 public class InternshipPhaseController {
 
     private final InternshipPhaseService phaseService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MENTOR', 'STUDENT')")
     public ResponseEntity<ApiResponse<?>> getAllPhases(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize) {
@@ -26,7 +26,7 @@ public class InternshipPhaseController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MENTOR', 'STUDENT')")
     public ResponseEntity<ApiResponse<?>> getPhaseById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(phaseService.getPhaseById(id)));
     }
