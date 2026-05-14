@@ -24,7 +24,6 @@ import re.edu.repository.EvaluationCriteriaRepository;
 import re.edu.repository.InternshipPhaseRepository;
 import re.edu.repository.RoundCriteriaRepository;
 import re.edu.service.AssessmentRoundService;
-import re.edu.util.Constants;
 import re.edu.util.RoundStatus;
 
 import java.util.List;
@@ -80,7 +79,7 @@ public class AssessmentRoundServiceImpl implements AssessmentRoundService {
     public AssessmentRoundResponse createRound(AssessmentRoundRequest request) {
         // Validate phase exists
         InternshipPhase phase = phaseRepository.findById(request.getPhaseId())
-                .orElseThrow(() -> new ResourceNotFoundException(Constants.ERROR_PHASE_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy giai đoạn với ID: " + request.getPhaseId()));
 
         // Validate dates within phase range
         if (request.getStartDate().isBefore(phase.getStartDate()) ||
@@ -127,7 +126,7 @@ public class AssessmentRoundServiceImpl implements AssessmentRoundService {
 
         // Validate phase exists
         InternshipPhase phase = phaseRepository.findById(request.getPhaseId())
-                .orElseThrow(() -> new ResourceNotFoundException(Constants.ERROR_PHASE_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy giai đoạn với ID: " + request.getPhaseId()));
 
         // Validate dates within phase range
         if (request.getStartDate().isBefore(phase.getStartDate()) ||

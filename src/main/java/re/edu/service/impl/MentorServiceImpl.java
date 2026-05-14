@@ -60,6 +60,11 @@ public class MentorServiceImpl implements MentorService {
         User currentUser = findUserByUsername(currentUsername);
         Mentor mentor = findById(id);
 
+        // Validate that the user associated with this mentor has MENTOR role
+        if (mentor.getUser().getRole() != Role.MENTOR) {
+            throw new ResourceNotFoundException("Mentor không tồn tại với ID: " + id);
+        }
+
         if (currentUser.getRole() == Role.MENTOR) {
             if (!mentor.getMentorId().equals(currentUser.getId())) {
                 throw new ForbiddenException("Bạn chỉ có thể xem thông tin của mình");

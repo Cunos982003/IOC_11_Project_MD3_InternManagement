@@ -14,10 +14,13 @@ public class StudentMapper {
 
     public StudentResponse toResponse(Student student) {
         StudentResponse response = modelMapper.map(student, StudentResponse.class);
+        response.setId(student.getStudentId());
         if (student.getUser() != null) {
             response.setUserId(student.getUser().getId());
             response.setUsername(student.getUser().getUsername());
+            response.setFullName(student.getUser().getFullName());
             response.setEmail(student.getUser().getEmail());
+            response.setPhoneNumber(student.getUser().getPhoneNumber());
         }
         return response;
     }

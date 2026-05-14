@@ -72,6 +72,11 @@ public class StudentServiceImpl implements StudentService {
         User currentUser = findUserByUsername(currentUsername);
         Student student = findById(id);
 
+        // Validate that the user associated with this student has STUDENT role
+        if (student.getUser().getRole() != Role.STUDENT) {
+            throw new ResourceNotFoundException("Sinh viên không tồn tại với ID: " + id);
+        }
+
         if (currentUser.getRole() == Role.STUDENT) {
             if (!student.getStudentId().equals(currentUser.getId())) {
                 throw new ForbiddenException("Bạn chỉ có thể xem thông tin của mình");

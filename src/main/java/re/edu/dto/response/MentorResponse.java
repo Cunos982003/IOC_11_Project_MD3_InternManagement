@@ -13,11 +13,11 @@ public class MentorResponse {
     private Long id;
     private Long userId;
     private String username;
-    private String email;
     private String fullName;
+    private String email;
+    private String phoneNumber;
     private String department;
-    private String phone;
-    private String specialization;
+    private String academicRank;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

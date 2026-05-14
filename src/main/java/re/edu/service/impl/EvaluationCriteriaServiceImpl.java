@@ -14,7 +14,6 @@ import re.edu.exception.ResourceNotFoundException;
 import re.edu.mapper.EvaluationCriteriaMapper;
 import re.edu.repository.EvaluationCriteriaRepository;
 import re.edu.service.EvaluationCriteriaService;
-import re.edu.util.Constants;
 
 import java.util.List;
 
@@ -85,6 +84,6 @@ public class EvaluationCriteriaServiceImpl implements EvaluationCriteriaService 
 
     private EvaluationCriteria findById(Long id) {
         return criteriaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(Constants.ERROR_CRITERIA_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tiêu chí với ID: " + id));
     }
 }

@@ -14,10 +14,13 @@ public class MentorMapper {
 
     public MentorResponse toResponse(Mentor mentor) {
         MentorResponse response = modelMapper.map(mentor, MentorResponse.class);
+        response.setId(mentor.getMentorId());
         if (mentor.getUser() != null) {
             response.setUserId(mentor.getUser().getId());
             response.setUsername(mentor.getUser().getUsername());
+            response.setFullName(mentor.getUser().getFullName());
             response.setEmail(mentor.getUser().getEmail());
+            response.setPhoneNumber(mentor.getUser().getPhoneNumber());
         }
         return response;
     }

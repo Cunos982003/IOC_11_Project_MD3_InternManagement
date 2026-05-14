@@ -14,14 +14,14 @@ public class StudentResponse {
     private Long id;
     private Long userId;
     private String username;
-    private String email;
-    private String studentCode;
     private String fullName;
-    private LocalDate dateOfBirth;
-    private String phone;
-    private String address;
-    private Double gpa;
+    private String email;
+    private String phoneNumber;
+    private String studentCode;
     private String major;
+    private String className;
+    private LocalDate dateOfBirth;
+    private String address;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

@@ -13,7 +13,6 @@ public class UserMapper {
     private final ModelMapper modelMapper;
 
     public UserResponse toResponse(User user) {
-
         return modelMapper.map(user, UserResponse.class);
     }
 }

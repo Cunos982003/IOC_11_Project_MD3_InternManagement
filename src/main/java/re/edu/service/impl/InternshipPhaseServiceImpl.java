@@ -15,7 +15,6 @@ import re.edu.exception.ResourceNotFoundException;
 import re.edu.mapper.InternshipPhaseMapper;
 import re.edu.repository.InternshipPhaseRepository;
 import re.edu.service.InternshipPhaseService;
-import re.edu.util.Constants;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -91,6 +90,6 @@ public class InternshipPhaseServiceImpl implements InternshipPhaseService {
 
     private InternshipPhase findById(Long id) {
         return phaseRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(Constants.ERROR_PHASE_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy giai đoạn với ID: " + id));
     }
 }
