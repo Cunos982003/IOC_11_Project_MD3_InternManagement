@@ -12,6 +12,10 @@ import java.util.Optional;
 public interface StudentRepository extends JpaRepository<Student, Long> {
     boolean existsByStudentCode(String studentCode);
 
-    @Query("SELECT s FROM Student s JOIN InternshipAssignment ia ON ia.student = s WHERE ia.mentor.id = :mentorId")
+    @Query("SELECT DISTINCT s FROM Student s LEFT JOIN FETCH s.user WHERE s.studentId IN " +
+           "(SELECT ia.student.studentId FROM InternshipAssignment ia WHERE ia.mentor.mentorId = :mentorId)")
     Page<Student> findAllByMentorId(@Param("mentorId") Long mentorId, Pageable pageable);
+
+    @Query("SELECT s FROM Student s LEFT JOIN FETCH s.user WHERE s.studentId = :id")
+    Optional<Student> findByIdWithUser(@Param("id") Long id);
 }
