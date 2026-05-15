@@ -99,7 +99,8 @@ public class InternshipAssignmentServiceImpl implements InternshipAssignmentServ
     @Override
     public InternshipAssignmentResponse getAssignmentById(Long id, String currentUsername) {
         User currentUser = findUserByUsername(currentUsername);
-        InternshipAssignment assignment = findById(id);
+        InternshipAssignment assignment = assignmentRepository.findByIdWithDetails(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy phân công với ID: " + id));
 
         // Role-based access control
         if (currentUser.getRole() == Role.MENTOR) {

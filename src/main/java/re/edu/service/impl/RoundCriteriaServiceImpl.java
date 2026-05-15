@@ -33,7 +33,7 @@ public class RoundCriteriaServiceImpl implements RoundCriteriaService {
         List<RoundCriteria> roundCriteriaList;
 
         if (roundId != null) {
-            roundCriteriaList = roundCriteriaRepository.findByRoundId(roundId);
+            roundCriteriaList = roundCriteriaRepository.findByRoundIdWithDetails(roundId);
         } else {
             roundCriteriaList = roundCriteriaRepository.findAll();
         }
@@ -45,7 +45,8 @@ public class RoundCriteriaServiceImpl implements RoundCriteriaService {
 
     @Override
     public RoundCriteriaResponse getRoundCriteriaById(Long id) {
-        RoundCriteria roundCriteria = findById(id);
+        RoundCriteria roundCriteria = roundCriteriaRepository.findByIdWithDetails(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tiêu chí đợt đánh giá với ID: " + id));
         return roundCriteriaMapper.toResponse(roundCriteria);
     }
 
@@ -72,7 +73,8 @@ public class RoundCriteriaServiceImpl implements RoundCriteriaService {
     @Override
     @Transactional
     public RoundCriteriaResponse updateRoundCriteria(Long id, RoundCriteriaRequest request) {
-        RoundCriteria roundCriteria = findById(id);
+        RoundCriteria roundCriteria = roundCriteriaRepository.findByIdWithDetails(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tiêu chí đợt đánh giá với ID: " + id));
         roundCriteria.setWeight(request.getWeight());
         RoundCriteria updated = roundCriteriaRepository.save(roundCriteria);
         return roundCriteriaMapper.toResponse(updated);
@@ -81,12 +83,8 @@ public class RoundCriteriaServiceImpl implements RoundCriteriaService {
     @Override
     @Transactional
     public void deleteRoundCriteria(Long id) {
-        RoundCriteria roundCriteria = findById(id);
-        roundCriteriaRepository.delete(roundCriteria);
-    }
-
-    private RoundCriteria findById(Long id) {
-        return roundCriteriaRepository.findById(id)
+        RoundCriteria roundCriteria = roundCriteriaRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tiêu chí đợt đánh giá với ID: " + id));
+        roundCriteriaRepository.delete(roundCriteria);
     }
 }

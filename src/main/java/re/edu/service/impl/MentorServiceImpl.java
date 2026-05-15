@@ -58,7 +58,8 @@ public class MentorServiceImpl implements MentorService {
     @Override
     public MentorResponse getMentorById(Long id, String currentUsername) {
         User currentUser = findUserByUsername(currentUsername);
-        Mentor mentor = findById(id);
+        Mentor mentor = mentorRepository.findByIdWithUser(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Mentor không tồn tại với ID: " + id));
 
         // Validate that the user associated with this mentor has MENTOR role
         if (mentor.getUser().getRole() != Role.MENTOR) {
@@ -110,7 +111,8 @@ public class MentorServiceImpl implements MentorService {
     @Override
     public MentorResponse updateMentor(Long id, UpdateMentorRequest request, String currentUsername) {
         User currentUser = findUserByUsername(currentUsername);
-        Mentor mentor = findById(id);
+        Mentor mentor = mentorRepository.findByIdWithUser(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Mentor không tồn tại với ID: " + id));
 
         if (currentUser.getRole() == Role.MENTOR) {
             if (!mentor.getMentorId().equals(currentUser.getId())) {
@@ -122,11 +124,6 @@ public class MentorServiceImpl implements MentorService {
         if (request.getAcademicRank() != null) mentor.setAcademicRank(request.getAcademicRank());
 
         return mentorMapper.toResponse(mentorRepository.save(mentor));
-    }
-
-    private Mentor findById(Long id) {
-        return mentorRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Mentor không tồn tại với ID: " + id));
     }
 
     private User findUserByUsername(String username) {

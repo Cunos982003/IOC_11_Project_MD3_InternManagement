@@ -48,7 +48,8 @@ public class EvaluationCriteriaServiceImpl implements EvaluationCriteriaService 
 
     @Override
     public EvaluationCriteriaResponse getCriteriaById(Long id) {
-        EvaluationCriteria criteria = findById(id);
+        EvaluationCriteria criteria = criteriaRepository.findByIdWithDetails(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tiêu chí với ID: " + id));
         return criteriaMapper.toResponse(criteria);
     }
 
@@ -65,7 +66,8 @@ public class EvaluationCriteriaServiceImpl implements EvaluationCriteriaService 
 
     @Override
     public EvaluationCriteriaResponse updateCriteria(Long id, EvaluationCriteriaRequest request) {
-        EvaluationCriteria criteria = findById(id);
+        EvaluationCriteria criteria = criteriaRepository.findByIdWithDetails(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tiêu chí với ID: " + id));
 
         if (!criteria.getName().equals(request.getName()) && criteriaRepository.existsByName(request.getName())) {
             throw new ConflictException("Tên tiêu chí đã tồn tại");
@@ -78,12 +80,8 @@ public class EvaluationCriteriaServiceImpl implements EvaluationCriteriaService 
 
     @Override
     public void deleteCriteria(Long id) {
-        EvaluationCriteria criteria = findById(id);
-        criteriaRepository.delete(criteria);
-    }
-
-    private EvaluationCriteria findById(Long id) {
-        return criteriaRepository.findById(id)
+        EvaluationCriteria criteria = criteriaRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tiêu chí với ID: " + id));
+        criteriaRepository.delete(criteria);
     }
 }

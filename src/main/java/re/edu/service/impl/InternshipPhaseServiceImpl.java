@@ -50,7 +50,8 @@ public class InternshipPhaseServiceImpl implements InternshipPhaseService {
 
     @Override
     public InternshipPhaseResponse getPhaseById(Long id) {
-        InternshipPhase phase = findById(id);
+        InternshipPhase phase = phaseRepository.findByIdWithDetails(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy giai đoạn với ID: " + id));
         return phaseMapper.toResponse(phase);
     }
 
@@ -71,7 +72,8 @@ public class InternshipPhaseServiceImpl implements InternshipPhaseService {
 
     @Override
     public InternshipPhaseResponse updatePhase(Long id, InternshipPhaseRequest request) {
-        InternshipPhase phase = findById(id);
+        InternshipPhase phase = phaseRepository.findByIdWithDetails(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy giai đoạn với ID: " + id));
 
         if (!phase.getName().equals(request.getName()) && phaseRepository.existsByName(request.getName())) {
             throw new ConflictException("Tên giai đoạn đã tồn tại");
@@ -84,12 +86,8 @@ public class InternshipPhaseServiceImpl implements InternshipPhaseService {
 
     @Override
     public void deletePhase(Long id) {
-        InternshipPhase phase = findById(id);
-        phaseRepository.delete(phase);
-    }
-
-    private InternshipPhase findById(Long id) {
-        return phaseRepository.findById(id)
+        InternshipPhase phase = phaseRepository.findByIdWithDetails(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy giai đoạn với ID: " + id));
+        phaseRepository.delete(phase);
     }
 }

@@ -8,6 +8,8 @@ public interface AssessmentResultService {
 
     PaginatedData<AssessmentResultResponse> getAllResults(int page, int pageSize, Long assignmentId, Long mentorId, Long studentId);
 
+    AssessmentResultResponse getResultById(Long id);
+
     AssessmentResultResponse createResult(AssessmentResultRequest request, String mentorUsername);
 
     AssessmentResultResponse updateResult(Long id, AssessmentResultRequest request, String mentorUsername);

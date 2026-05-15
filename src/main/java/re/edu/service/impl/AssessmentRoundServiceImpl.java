@@ -70,14 +70,15 @@ public class AssessmentRoundServiceImpl implements AssessmentRoundService {
 
     @Override
     public AssessmentRoundResponse getRoundById(Long id) {
-        AssessmentRound round = findById(id);
+        AssessmentRound round = roundRepository.findByIdWithPhase(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đợt đánh giá với ID: " + id));
         return toResponseWithCriteria(round);
     }
 
     @Override
     @Transactional
     public AssessmentRoundResponse createRound(AssessmentRoundRequest request) {
-        InternshipPhase phase = phaseRepository.findById(request.getPhaseId())
+        InternshipPhase phase = phaseRepository.findByIdWithDetails(request.getPhaseId())
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy giai đoạn với ID: " + request.getPhaseId()));
 
         if (request.getStartDate().isBefore(phase.getStartDate()) ||
@@ -99,7 +100,7 @@ public class AssessmentRoundServiceImpl implements AssessmentRoundService {
 
         double defaultWeight = 1.0 / request.getCriteriaIds().size();
         for (Long criteriaId : request.getCriteriaIds()) {
-            EvaluationCriteria criteria = criteriaRepository.findById(criteriaId)
+            EvaluationCriteria criteria = criteriaRepository.findByIdWithDetails(criteriaId)
                     .orElseThrow(() -> new ResourceNotFoundException("Tiêu chí không tồn tại với ID: " + criteriaId));
 
             RoundCriteria roundCriteria = RoundCriteria.builder()
@@ -116,9 +117,10 @@ public class AssessmentRoundServiceImpl implements AssessmentRoundService {
     @Override
     @Transactional
     public AssessmentRoundResponse updateRound(Long id, AssessmentRoundRequest request) {
-        AssessmentRound round = findById(id);
+        AssessmentRound round = roundRepository.findByIdWithPhase(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đợt đánh giá với ID: " + id));
 
-        InternshipPhase phase = phaseRepository.findById(request.getPhaseId())
+        InternshipPhase phase = phaseRepository.findByIdWithDetails(request.getPhaseId())
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy giai đoạn với ID: " + request.getPhaseId()));
 
         if (request.getStartDate().isBefore(phase.getStartDate()) ||
@@ -138,7 +140,7 @@ public class AssessmentRoundServiceImpl implements AssessmentRoundService {
             roundCriteriaRepository.deleteByRoundId(id);
             double defaultWeight = 1.0 / request.getCriteriaIds().size();
             for (Long criteriaId : request.getCriteriaIds()) {
-                EvaluationCriteria criteria = criteriaRepository.findById(criteriaId)
+                EvaluationCriteria criteria = criteriaRepository.findByIdWithDetails(criteriaId)
                         .orElseThrow(() -> new ResourceNotFoundException("Tiêu chí không tồn tại với ID: " + criteriaId));
 
                 RoundCriteria roundCriteria = RoundCriteria.builder()
@@ -156,21 +158,17 @@ public class AssessmentRoundServiceImpl implements AssessmentRoundService {
     @Override
     @Transactional
     public void deleteRound(Long id) {
-        AssessmentRound round = findById(id);
+        AssessmentRound round = roundRepository.findByIdWithPhase(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đợt đánh giá với ID: " + id));
 
         roundCriteriaRepository.deleteByRoundId(id);
 
         roundRepository.delete(round);
     }
 
-    private AssessmentRound findById(Long id) {
-        return roundRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đợt đánh giá với ID: " + id));
-    }
-
     private AssessmentRoundResponse toResponseWithCriteria(AssessmentRound round) {
         AssessmentRoundResponse response = roundMapper.toResponse(round);
-        List<RoundCriteria> roundCriteria = roundCriteriaRepository.findByRoundId(round.getId());
+        List<RoundCriteria> roundCriteria = roundCriteriaRepository.findByRoundIdWithDetails(round.getId());
         List<EvaluationCriteriaResponse> criteriaResponses = roundCriteria.stream()
                 .map(rc -> criteriaMapper.toResponse(rc.getCriteria()))
                 .collect(Collectors.toList());

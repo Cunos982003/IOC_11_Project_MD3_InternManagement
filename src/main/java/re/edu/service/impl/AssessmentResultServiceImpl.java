@@ -81,25 +81,32 @@ public class AssessmentResultServiceImpl implements AssessmentResultService {
 
 
     @Override
+    public AssessmentResultResponse getResultById(Long id) {
+        AssessmentResult result = resultRepository.findByIdWithDetails(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy kết quả đánh giá với ID: " + id));
+        return resultMapper.toResponse(result);
+    }
+
+    @Override
     @Transactional
     public AssessmentResultResponse createResult(AssessmentResultRequest request, String mentorUsername) {
         User mentorUser = userRepository.findByUsername(mentorUsername)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy người dùng"));
 
-        Mentor mentor = mentorRepository.findById(mentorUser.getId())
+        Mentor mentor = mentorRepository.findByIdWithUser(mentorUser.getId())
                 .orElseThrow(() -> new ForbiddenException("Chỉ giáo viên mới có thể đánh giá"));
 
-        InternshipAssignment assignment = assignmentRepository.findById(request.getAssignmentId())
+        InternshipAssignment assignment = assignmentRepository.findByIdWithDetails(request.getAssignmentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy phân công với ID: " + request.getAssignmentId()));
 
         if (!assignment.getMentor().getMentorId().equals(mentor.getMentorId())) {
             throw new ForbiddenException("Bạn không được phân công đánh giá sinh viên này");
         }
 
-        AssessmentRound round = roundRepository.findById(request.getRoundId())
+        AssessmentRound round = roundRepository.findByIdWithPhase(request.getRoundId())
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đợt đánh giá với ID: " + request.getRoundId()));
 
-        EvaluationCriteria criterion = criteriaRepository.findById(request.getCriterionId())
+        EvaluationCriteria criterion = criteriaRepository.findByIdWithDetails(request.getCriterionId())
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy tiêu chí với ID: " + request.getCriterionId()));
 
         if (request.getScore() > criterion.getMaxScore()) {
@@ -128,11 +135,13 @@ public class AssessmentResultServiceImpl implements AssessmentResultService {
     @Override
     @Transactional
     public AssessmentResultResponse updateResult(Long id, AssessmentResultRequest request, String mentorUsername) {
-        AssessmentResult result = findById(id);
+        AssessmentResult result = resultRepository.findByIdWithDetails(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy kết quả đánh giá với ID: " + id));
+
         User mentorUser = userRepository.findByUsername(mentorUsername)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy người dùng"));
 
-        Mentor mentor = mentorRepository.findById(mentorUser.getId())
+        Mentor mentor = mentorRepository.findByIdWithUser(mentorUser.getId())
                 .orElseThrow(() -> new ForbiddenException("Chỉ giáo viên mới có thể đánh giá"));
 
         if (!result.getEvaluatedBy().getId().equals(mentorUser.getId())) {
@@ -150,10 +159,5 @@ public class AssessmentResultServiceImpl implements AssessmentResultService {
 
         AssessmentResult updated = resultRepository.save(result);
         return resultMapper.toResponse(updated);
-    }
-
-    private AssessmentResult findById(Long id) {
-        return resultRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy kết quả đánh giá với ID: " + id));
     }
 }

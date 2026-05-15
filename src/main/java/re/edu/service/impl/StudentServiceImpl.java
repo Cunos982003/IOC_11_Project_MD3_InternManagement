@@ -70,9 +70,9 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public StudentResponse getStudentById(Long id, String currentUsername) {
         User currentUser = findUserByUsername(currentUsername);
-        Student student = findById(id);
+        Student student = studentRepository.findByIdWithUser(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Sinh viên không tồn tại với ID: " + id));
 
-        // Validate that the user associated with this student has STUDENT role
         if (student.getUser().getRole() != Role.STUDENT) {
             throw new ResourceNotFoundException("Sinh viên không tồn tại với ID: " + id);
         }
@@ -125,7 +125,8 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public StudentResponse updateStudent(Long id, UpdateStudentRequest request, String currentUsername) {
         User currentUser = findUserByUsername(currentUsername);
-        Student student = findById(id);
+        Student student = studentRepository.findByIdWithUser(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Sinh viên không tồn tại với ID: " + id));
 
         if (currentUser.getRole() == Role.STUDENT) {
             if (!student.getStudentId().equals(currentUser.getId())) {
@@ -138,11 +139,6 @@ public class StudentServiceImpl implements StudentService {
         if (request.getMajor() != null) student.setMajor(request.getMajor());
 
         return studentMapper.toResponse(studentRepository.save(student));
-    }
-
-    private Student findById(Long id) {
-        return studentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Sinh viên không tồn tại với ID: " + id));
     }
 
     private User findUserByUsername(String username) {

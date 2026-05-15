@@ -31,6 +31,12 @@ public class AssessmentResultController {
                 resultService.getAllResults(page, pageSize, assignmentId, mentorId, studentId)));
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MENTOR', 'STUDENT')")
+    public ResponseEntity<ApiResponse<?>> getResultById(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.success(resultService.getResultById(id)));
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('MENTOR')")
     public ResponseEntity<ApiResponse<?>> createResult(
