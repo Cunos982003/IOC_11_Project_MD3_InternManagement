@@ -1,6 +1,7 @@
 package re.edu.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import re.edu.entity.RoundCriteria;
@@ -8,7 +9,7 @@ import re.edu.entity.RoundCriteria;
 import java.util.List;
 import java.util.Optional;
 
-public interface RoundCriteriaRepository extends JpaRepository<RoundCriteria, Long> {
+public interface RoundCriteriaRepository extends JpaRepository<RoundCriteria, Long>, JpaSpecificationExecutor<RoundCriteria> {
     List<RoundCriteria> findByRoundId(Long roundId);
     boolean existsByRoundIdAndCriteriaId(Long roundId, Long criteriaId);
     void deleteByRoundId(Long roundId);

@@ -1,9 +1,15 @@
 package re.edu.service.impl;
 
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import re.edu.dto.request.RoundCriteriaRequest;
+import re.edu.dto.response.PaginatedData;
 import re.edu.dto.response.RoundCriteriaResponse;
 import re.edu.entity.AssessmentRound;
 import re.edu.entity.EvaluationCriteria;
@@ -16,8 +22,8 @@ import re.edu.repository.EvaluationCriteriaRepository;
 import re.edu.repository.RoundCriteriaRepository;
 import re.edu.service.RoundCriteriaService;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,18 +35,36 @@ public class RoundCriteriaServiceImpl implements RoundCriteriaService {
     private final RoundCriteriaMapper roundCriteriaMapper;
 
     @Override
-    public List<RoundCriteriaResponse> getAllRoundCriteria(Long roundId) {
-        List<RoundCriteria> roundCriteriaList;
+    public PaginatedData<RoundCriteriaResponse> getAllRoundCriteria(int page, int pageSize, Long roundId) {
+        Pageable pageable = PageRequest.of(page - 1, pageSize);
 
-        if (roundId != null) {
-            roundCriteriaList = roundCriteriaRepository.findByRoundIdWithDetails(roundId);
-        } else {
-            roundCriteriaList = roundCriteriaRepository.findAll();
-        }
+        Specification<RoundCriteria> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
 
-        return roundCriteriaList.stream()
+            if (roundId != null) {
+                predicates.add(cb.equal(root.get("round").get("id"), roundId));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        Page<RoundCriteria> roundCriteriaPage = roundCriteriaRepository.findAll(spec, pageable);
+
+        List<RoundCriteriaResponse> items = roundCriteriaPage.getContent().stream()
                 .map(roundCriteriaMapper::toResponse)
-                .collect(Collectors.toList());
+                .toList();
+
+        PaginatedData.Pagination pagination = PaginatedData.Pagination.builder()
+                .currentPage(page)
+                .pageSize(pageSize)
+                .totalPages(roundCriteriaPage.getTotalPages())
+                .totalItems(roundCriteriaPage.getTotalElements())
+                .build();
+
+        return PaginatedData.<RoundCriteriaResponse>builder()
+                .items(items)
+                .pagination(pagination)
+                .build();
     }
 
     @Override

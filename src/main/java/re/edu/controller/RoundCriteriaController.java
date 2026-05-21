@@ -20,8 +20,10 @@ public class RoundCriteriaController {
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'MENTOR', 'STUDENT')")
     public ResponseEntity<ApiResponse<?>> getAllRoundCriteria(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int pageSize,
             @RequestParam(required = false) Long roundId) {
-        return ResponseEntity.ok(ApiResponse.success(roundCriteriaService.getAllRoundCriteria(roundId)));
+        return ResponseEntity.ok(ApiResponse.success(roundCriteriaService.getAllRoundCriteria(page, pageSize, roundId)));
     }
 
     @GetMapping("/{id}")
