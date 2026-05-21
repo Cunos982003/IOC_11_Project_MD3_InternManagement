@@ -50,7 +50,7 @@ public class AssessmentResultServiceImpl implements AssessmentResultService {
             }
 
             if (mentorId != null) {
-                predicates.add(cb.equal(root.get("mentor").get("mentorId"), mentorId));
+                predicates.add(cb.equal(root.get("assignment").get("mentor").get("mentorId"), mentorId));
             }
 
             if (studentId != null) {
